@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historial - FakeStore</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header__logo"><h1><a href="index.html">FakeStore</a></h1></div>
+    <nav class="header__nav">
+      <a href="index.html" class="btn btn--ghost">Inicio</a>
+      <a href="history.html" class="btn btn--primary">Historial</a>
+    </nav>
+  </header>
+  <main>
+    <section id="history-section">
+      <h2>Historial de Compras</h2>
+      <div id="history-items"></div>
+      <button class="btn" onclick="clearPurchaseHistory(); renderHistory();">Limpiar</button>
+      <button class="btn btn--ghost" onclick="getSalesReport();">Generar Informe</button>
+    </section>
+  </main>
+  <script src="js/cart.js"></script>
+  <script>
+    function renderHistory() {
+      const history = loadPurchaseHistory() || [];
+      const container = document.getElementById('history-items');
+      if (history.length === 0) {
+        container.innerHTML = '<p>Sin compras.</p>';
+        return;
+      }
+      container.innerHTML = history.map(h => `
+        <article class="history-item">
+          <header>Fecha: ${h.date} | Método: ${h.paymentMethod} | Total: $${h.total.toFixed(2)} (Dscto: ${h.discount*100}%)</header>
+          <ul>${h.items.map(item => `<li>${item.title} x${item.quantity}: $${(item.unitPrice * item.quantity).toFixed(2)}</li>`).join('')}</ul>
+        </article>
+      `).join('');
+    }
+    renderHistory();
+  </script>
+</body>
+</html>
+    <footer class="footer">
+        <p>Proyecto FakeStore JavaScript - Brayan Espinosa Osorio</p>
+    </footer>
