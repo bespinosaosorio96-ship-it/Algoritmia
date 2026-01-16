@@ -199,3 +199,24 @@ function getSalesReport() {
   console.table({ TotalVentas: total.toFixed(2), Compras: history.length });
 }
 
+// Usar funciones de users.js
+function saveCartToStorage() {
+  const cartData = { cart, currentCoupon, couponDiscountRate };
+  window.saveCartToStorage(cartData); // Llamada global
+}
+
+function loadCartFromStorage() {
+  const loaded = window.loadCartFromStorage();
+  cart = loaded.cart || {};
+  currentCoupon = loaded.currentCoupon || null;
+  couponDiscountRate = loaded.couponDiscountRate || 0;
+  return cart;
+}
+
+function savePurchaseHistory(purchaseData) {
+  window.savePurchaseHistory(purchaseData);
+}
+
+function loadPurchaseHistory() {
+  return window.loadPurchaseHistory();
+}

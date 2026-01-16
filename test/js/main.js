@@ -68,4 +68,55 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// Modal Auth
+document.addEventListener('DOMContentLoaded', () => {
+  // Login/Register
+  const authModal = document.getElementById('auth-modal');
+  const authForm = document.getElementById('auth-form');
+  const modalTitle = document.getElementById('modal-title');
+  const toggleAuth = document.getElementById('toggle-auth');
+  
+  let isRegister = false;
+  
+  if (toggleAuth) {
+    toggleAuth.onclick = () => {
+      isRegister = !isRegister;
+      modalTitle.textContent = isRegister ? 'Registrarse' : 'Iniciar Sesión';
+      toggleAuth.textContent = isRegister ? 'Tengo cuenta' : 'Crear cuenta';
+    };
+  }
+  
+  if (authForm) {
+    authForm.onsubmit = (e) => {
+      e.preventDefault();
+      const email = document.getElementById('user-email').value;
+      const password = document.getElementById('user-password').value;
+      if (isRegister) {
+        window.registerUser(email, password);
+      } else {
+        window.loginUser(email, password);
+      }
+      if (window.currentUser) {
+        authModal.classList.remove('active');
+        location.reload();
+      }
+    };
+  }
+  
+  // Botón login
+  const loginBtn = document.createElement('button');
+  loginBtn.className = 'btn btn--ghost';
+  loginBtn.id = 'login-btn';
+  loginBtn.textContent = window.currentUser ? `Logout (${window.currentUser})` : 'Login';
+  loginBtn.onclick = () => {
+    if (window.currentUser) {
+      window.logoutUser();
+      location.reload();
+    } else {
+      authModal.classList.add('active');
+    }
+  };
+  document.querySelector('.header__nav').prepend(loginBtn);
+});
+
 init();

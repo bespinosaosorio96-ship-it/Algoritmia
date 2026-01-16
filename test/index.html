@@ -3,19 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FakeStore - Proyecto JavaScript</title>
+  <title>FakeStore - Tienda Completa con Login</title>
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Estilos Modal Inline */
+    .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center}
+    .modal.active{display:flex}
+    .modal__content{background:#fff;padding:2rem;border-radius:12px;max-width:400px;width:90%;box-shadow:0 10px 30px rgba(0,0,0,0.3)}
+    .form-group{margin-bottom:1rem}
+    .form-group input{padding:0.75rem;border:1px solid #ddd;border-radius:6px;width:100%;box-sizing:border-box}
+    .w-full{width:100%}
+    .user-status{font-weight:bold;color:#007bff}
+  </style>
 </head>
 <body>
   <header class="header">
     <div class="header__logo">
-      <h1>FakeStore</h1>
+      <h1>FakeStore <span id="user-status" class="user-status"></span></h1>
     </div>
     <nav class="header__nav">
-      <button class="btn btn--ghost" type="button">Inicio</button>
-      <button class="btn btn--ghost" type="button">Productos</button>
-      <button class="btn btn--ghost" type="button">Contacto</button>
       <a href="history.html" class="btn btn--ghost">Historial</a>
+      <button id="login-btn" class="btn btn--ghost">Login</button>
     </nav>
     <button class="header__cart-btn" type="button" aria-label="Carrito">
       <span class="header__cart-count">0</span>
@@ -25,134 +33,105 @@
   <main class="main">
     <!-- Filtros -->
     <section class="filters">
-      <h2 class="visually-hidden">Filtros y búsqueda</h2>
+      <h2 class="visually-hidden">Filtros</h2>
       <div class="filters__search">
-        <label for="search">Buscar producto</label>
-        <input type="search" id="search" placeholder="Buscar por nombre o descripción">
+        <label for="search">Buscar</label>
+        <input type="search" id="search" placeholder="Nombre o descripción">
       </div>
       <div class="filters__controls">
         <div class="filters__group">
           <label for="category">Categoría</label>
-          <select id="category">
-            <option value="all">Todas</option>
-          </select>
+          <select id="category"><option value="all">Todas</option></select>
         </div>
         <div class="filters__group">
-          <label for="sort">Ordenar por</label>
+          <label for="sort">Ordenar</label>
           <select id="sort">
-            <option value="default">Por defecto</option>
-            <option value="price-asc">Precio menor a mayor</option>
-            <option value="price-desc">Precio mayor a menor</option>
-            <option value="name-asc">Nombre A-Z</option>
-            <option value="name-desc">Nombre Z-A</option>
+            <option value="default">Defecto</option>
+            <option value="price-asc">Precio ↓</option>
+            <option value="price-desc">Precio ↑</option>
           </select>
         </div>
       </div>
     </section>
 
-    <!-- Productos -->
+    <!-- Layout Productos + Carrito -->
     <section class="layout">
-      <!-- Listado de productos -->
       <section class="products" id="products">
-        <h2 class="visually-hidden">Listado de productos</h2>
-        <!-- JS inserta aquí las tarjetas -->
+        <h2 class="visually-hidden">Productos</h2>
       </section>
 
-      <!-- Carrito + pago -->
       <aside class="cart" id="cart">
         <div class="cart__head">
-          <h2 class="cart__title">Tu Carrito</h2>
-          <span class="cart__count" id="cart-count-label">0 artículos</span>
+          <h2>Tu Carrito</h2>
+          <span id="cart-count-label">0 artículos</span>
         </div>
-        <div class="cart__items" id="cart-items">
-          <!-- Items del carrito generados con JS -->
-        </div>
+        <div class="cart__items" id="cart-items"></div>
 
-        <section class="cart__summary" aria-label="Resumen del pedido">
-          <h3 class="cart__summary-title">Resumen del pedido</h3>
+        <section class="cart__summary">
+          <h3>Resumen</h3>
           <div class="cart__summary-row">
-            <span>Subtotal</span>
-            <span id="cart-subtotal">$0.00</span>
+            <span>Subtotal</span><span id="cart-subtotal">$0.00</span>
           </div>
-          <div class="cart__summary-row cart__summary-row--muted">
-            <span>Envío</span>
-            <span>Gratis</span>
+          <div class="cart__summary-row--muted">
+            <span>Envío</span><span>Gratis</span>
           </div>
-          <div class="cart__summary-row cart__summary-row--muted">
-            <span>Impuestos</span>
-            <span>Calculado al pagar</span>
-          </div>
-          <hr class="cart__divider">
+          <hr>
           <div class="cart__summary-total">
-            <span>Total</span>
-            <strong id="cart-total">$0.00</strong>
+            <span>Total</span><strong id="cart-total">$0.00</strong>
           </div>
 
           <!-- Cupón -->
           <div class="cart__coupon">
-            <input class="cart__coupon-input" type="text" placeholder="Código de descuento">
-            <button class="btn cart__coupon-btn" type="button">Aplicar</button>
+            <input class="cart__coupon-input" type="text" placeholder="PROMO10 o PROMO20">
+            <button class="btn cart__coupon-btn">Aplicar</button>
           </div>
 
-          <button class="btn btn--primary cart__pay-btn" type="button">Proceder al pago</button>
-
-          <!-- Formulario checkout -->
           <form class="checkout" id="checkout-form">
-            <h4 class="checkout__title">Datos de pago (simulación)</h4>
+            <h4>Pago (Simulación)</h4>
             <div class="checkout__group">
-              <label for="checkout-name">Nombre en la tarjeta</label>
-              <input type="text" id="checkout-name" name="name" placeholder="Nombre Apellido" required>
+              <input type="text" id="checkout-name" placeholder="Nombre" required>
             </div>
             <div class="checkout__group">
-              <label for="checkout-card">Número de tarjeta</label>
-              <input type="text" id="checkout-card" name="card" maxlength="19" placeholder="XXXX XXXX XXXX XXXX" required>
+              <input type="text" id="checkout-card" placeholder="XXXX XXXX XXXX XXXX" maxlength="19" required>
             </div>
             <div class="checkout__row">
-              <div class="checkout__group">
-                <label for="checkout-exp">Vencimiento</label>
-                <input type="text" id="checkout-exp" name="exp" placeholder="MM/AA" required>
-              </div>
-              <div class="checkout__group">
-                <label for="checkout-cvv">CVV</label>
-                <input type="password" id="checkout-cvv" name="cvv" maxlength="4" placeholder="***" required>
-              </div>
+              <input type="text" id="checkout-exp" placeholder="MM/AA" required>
+              <input type="password" id="checkout-cvv" placeholder="CVV" maxlength="4" required>
             </div>
-            <!-- Métodos de pago nuevos -->
             <div class="checkout__group">
-              <label>Método de pago</label>
+              <label>Método:</label>
               <label><input type="radio" name="payment-method" value="tarjeta" checked> Tarjeta</label>
               <label><input type="radio" name="payment-method" value="efectivo"> Efectivo</label>
-              <label><input type="radio" name="payment-method" value="transferencia"> Transferencia</label>
             </div>
-            <button class="btn btn--primary checkout__btn" type="submit">Simular pago</button>
-            <p class="checkout__note">Simulación. No se cobra real.</p>
+            <button type="submit" class="btn btn--primary">Pagar</button>
           </form>
         </section>
       </aside>
     </section>
   </main>
 
-  <footer class="footer">
-    <p>Proyecto FakeStore JavaScript - Brayan Espinosa Osorio</p>
-  </footer>
+  <!-- MODAL LOGIN/REGISTER -->
+  <div id="auth-modal" class="modal">
+    <div class="modal__content">
+      <h3 id="modal-title">Iniciar Sesión</h3>
+      <form id="auth-form">
+        <div class="form-group">
+          <input type="email" id="user-email" placeholder="Email" required>
+        </div>
+        <div class="form-group">
+          <input type="password" id="user-password" placeholder="Contraseña" required>
+        </div>
+        <button type="submit" class="btn btn--primary w-full">Entrar</button>
+        <button type="button" id="toggle-auth" class="btn btn--ghost w-full">Crear Cuenta</button>
+      </form>
+    </div>
+  </div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast" aria-live="polite"></div>
-
-  <!-- Scripts -->
+  <!-- Scripts en orden correcto -->
+  <script src="js/users.js"></script>
   <script src="js/api.js"></script>
   <script src="js/cart.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/main.js"></script>
-  <script>
-    // Enlazar cupón al hacer clic
-    document.addEventListener('DOMContentLoaded', () => {
-      const couponBtn = document.querySelector('.cart__coupon-btn');
-      const couponInput = document.querySelector('.cart__coupon-input');
-      if (couponBtn && couponInput) {
-        couponBtn.addEventListener('click', () => applyCoupon(couponInput.value));
-      }
-    });
-  </script>
 </body>
 </html>
